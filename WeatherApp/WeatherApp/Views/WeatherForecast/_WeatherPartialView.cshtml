@@ -1,0 +1,78 @@
+﻿@model WeatherApp.ViewModels.WeatherViewModel
+
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title">Weather in @Model.Location</h3>
+        <div class="row mt-2">
+            <div class="col-sm-12 col-lg-4">
+                <p class="card-text">
+                    Temperature: <br />
+                    <span style="font-weight:bold" id="temperature">@Model.Temperature</span> <br />
+                    <button class="btn btn-sm btn-secondary mt-2" onclick="toggleTemperatureUnit()">Convert °C / °F</button>
+                </p>
+                <p class="card-text">Wind Speed: <br /> <span style="font-weight:bold">@Model.WindSpeed</span></p>
+                <p class="card-text">Humidity: <br /> <span style="font-weight:bold">@Model.Humidity</span></p>
+            </div>
+            <div class="col-sm-12 col-lg-4">
+                <p class="card-text">Condition: <br /> <span style="font-weight:bold">@Model.Condition</span></p>
+                <img style="width: 35%;border: solid;border-radius: 100%;" src="@Model.IconUrl" alt="Weather Icon" />
+            </div>
+            <div class="col-sm-12 col-lg-4">
+                <p class="card-text">Pressure: <br /> <span style="font-weight:bold">@Model.Pressure</span></p>
+                <p class="card-text">Visibility: <br /> <span style="font-weight:bold">@Model.Visibility</span></p>
+                <p class="card-text">UV Index: <br /> <span style="font-weight:bold">@Model.UVIndex</span></p>
+            </div>
+            <div class="col-sm-12 mt-3">
+                <button style="width: 30%" class="btn btn-sm btn-primary" onclick="refreshWeather()">Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to toggle between Celsius and Fahrenheit
+    function toggleTemperatureUnit() {
+        var temperatureElement = document.getElementById("temperature");
+        var currentTemperature = temperatureElement.innerText;
+        var isCelsius = currentTemperature.includes("°C");
+
+        // If currently in Celsius, switch to Fahrenheit; otherwise, switch to Celsius
+        if (isCelsius) {
+            var fahrenheit = Math.round((parseInt(currentTemperature) * 9 / 5) + 32);
+            temperatureElement.innerText = fahrenheit + " °F";
+        } else {
+            var celsius = Math.round((parseInt(currentTemperature) - 32) * 5 / 9);
+            temperatureElement.innerText = celsius + " °C";
+        }
+    }
+
+    // Function to refresh weather data
+    function refreshWeather() {
+        // Show loader while data is being fetched
+        $("#loader-container").removeClass("d-none");
+     
+
+        // Get the location and unit from the form inputs
+        var location = document.getElementById("location").value;
+        var unit = document.getElementById("unit").value;
+
+        // Call the GetWeather function with the location and unit
+        $.ajax({
+            url: '@Url.Action("GetWeather", "Weather")',
+            type: 'POST',
+            data: { location: location, unit: unit },
+            success: function (result) {
+                // Update the weather data in the UI
+                $("#weatherResult").html(result).show();
+                // Hide loader when data fetching is complete
+                $("#loader-container").addClass("d-none");
+            },
+            error: function (xhr, status, error) {
+                alert("An error occurred: " + error);
+                // Hide loader in case of error
+                $("#loader-container").hide();
+            }
+        });
+    }
+
+</script>

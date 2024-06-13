@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "Weather Forecast";
+}
+
+<section>
+    <div class="container">
+        <div class="card" style="padding: 20px 10px;">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="mb-4 text-center">Get Your Weather Forecast Now!</h2>
+                <form id="weatherForm" method="post">
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" class="form-control" id="location" name="location" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit:</label>
+                        <select class="form-control" id="unit" name="unit">
+                            <option value="C">Celsius</option>
+                            <option value="F">Fahrenheit</option>
+                        </select>
+                    </div>
+                        <button type="submit" class="btn btn-primary mt-2" style="width: 100%">Get The Weather Forecast</button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loader -->
+<div id="loader-container" class="d-none">
+    <div id="loader" class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <div id="loader-overlay"></div>
+</div>
+
+
+<div id="weatherResult" class="mt-4 text-center">
+    <!-- Weather data will be loaded here -->
+</div>
+
+@section Scripts {
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#weatherForm").submit(function (event) {
+                event.preventDefault();
+                $("#loader-container").removeClass("d-none"); // Show loader
+                $("#weatherResult").empty(); // Clear previous weather data
+
+                $.ajax({
+                    url: '@Url.Action("GetWeather", "Weather")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        $("#weatherResult").html(result); // Display weather data
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred: " + error);
+                    },
+                    complete: function () {
+                        $("#loader-container").addClass("d-none"); // Hide loader
+                    }
+                });
+            });
+        });
+
+    </script>
+    <style>
+        /* Loader styles */
+        #loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+        }
+
+        #loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -25px;
+            margin-left: -25px;
+        }
+
+        #loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+        }
+
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+}
