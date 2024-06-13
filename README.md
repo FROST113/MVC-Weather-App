@@ -25,7 +25,7 @@ A simple weather forecast application built with ASP.NET Core and jQuery.
 ### Steps
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/yourrepository.git
+    git clone https://github.com/FROST113/MVC-Weather-App.git
     cd yourrepository
     ```
 
