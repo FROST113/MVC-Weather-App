@@ -65,6 +65,8 @@ Desktop
 ![image](https://github.com/FROST113/MVC-Weather-App/assets/132884458/4ce29cae-aac7-40e7-be21-b2cd6affc196)
 
 Mobile
+
+
 ![image](https://github.com/FROST113/MVC-Weather-App/assets/132884458/156a996f-80f1-4322-b5b2-3f1399a63a41)
 
 
