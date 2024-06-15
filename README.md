@@ -62,12 +62,15 @@ Contributions are welcome! Please follow these steps to contribute:
 ## Screenshots
 
 Desktop 
-![image](https://github.com/FROST113/MVC-Weather-App/assets/132884458/4ce29cae-aac7-40e7-be21-b2cd6affc196)
+
+![image](https://github.com/FROST113/MVC-Weather-App/assets/48238264/dc40a8b6-d847-4767-b4ea-22e410694143)
+
 
 Mobile
 
+![image](https://github.com/FROST113/MVC-Weather-App/assets/48238264/d5946fd5-68c7-4bac-8128-9246f9cd064f)
 
-![image](https://github.com/FROST113/MVC-Weather-App/assets/132884458/156a996f-80f1-4322-b5b2-3f1399a63a41)
+
 
 
 
