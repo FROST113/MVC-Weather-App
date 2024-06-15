@@ -22,24 +22,45 @@ namespace WeatherApp.Services
 
         public async Task<WeatherViewModel> GetWeatherAsync(string location, string unit)
         {
-            var response = await _client.GetAsync($"v1/current.json?key={_settings.ApiKey}&q={location}&aqi=no");
-            response.EnsureSuccessStatusCode();
-            var responseData = await response.Content.ReadAsStringAsync();
-            var weatherData = JsonConvert.DeserializeObject<WeatherData>(responseData);
-
-            return new WeatherViewModel
+            try
             {
-                Location = $"{weatherData.Location.Name}, {weatherData.Location.Country}",
-                Temperature = unit == "C" ? $"{weatherData.Current.Temp_c} °C" : $"{weatherData.Current.Temp_f} °F",
-                Condition = weatherData.Current.Condition.Text,
-                IconUrl = $"https:{weatherData.Current.Condition.Icon}",
-                WindSpeed = $"{weatherData.Current.Wind_kph} kph",
-                Humidity = $"{weatherData.Current.Humidity}%",
-                Pressure = $"{weatherData.Current.Pressure_mb} mb",
-                Visibility = $"{weatherData.Current.Vis_km} km",
-                UVIndex = $"{weatherData.Current.Uv}",
-                CloudCover = $"{weatherData.Current.Cloud}%"
-            };
+                var response = await _client.GetAsync($"v1/current.json?key={_settings.ApiKey}&q={location}&aqi=no");
+                response.EnsureSuccessStatusCode();
+                var responseData = await response.Content.ReadAsStringAsync();
+                var weatherData = JsonConvert.DeserializeObject<WeatherData>(responseData);
+
+                return new WeatherViewModel
+                {
+                    Location = $"{weatherData.Location.Name}, {weatherData.Location.Country}",
+                    Temperature = unit == "C" ? $"{weatherData.Current.Temp_c} °C" : $"{weatherData.Current.Temp_f} °F",
+                    Condition = weatherData.Current.Condition.Text,
+                    IconUrl = $"https:{weatherData.Current.Condition.Icon}",
+                    WindSpeed = $"{weatherData.Current.Wind_kph} kph",
+                    Humidity = $"{weatherData.Current.Humidity}%",
+                    Pressure = $"{weatherData.Current.Pressure_mb} mb",
+                    Visibility = $"{weatherData.Current.Vis_km} km",
+                    UVIndex = $"{weatherData.Current.Uv}",
+                    CloudCover = $"{weatherData.Current.Cloud}%"
+                };
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log the exception
+                Console.WriteLine($"An HTTP error occurred: {ex.Message}");
+                throw; // Re-throw the exception to be handled in the controller
+            }
+            catch (JsonException ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error deserializing JSON: {ex.Message}");
+                throw; // Re-throw the exception to be handled in the controller
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw; // Re-throw the exception to be handled in the controller
+            }
         }
     }
 }

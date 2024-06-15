@@ -13,7 +13,8 @@
                             <div class="col-sm-12 col-lg-6">
                                 <div class="form-group">
                                     <label for="location">Location:</label>
-                                    <input type="text" class="form-control" id="location" name="location" required />
+                                    <input type="text" class="form-control" id="location" name="location"  />
+                                    <div class="invalid-feedback">Please enter letters and spaces only.</div>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-lg-6">
@@ -43,7 +44,7 @@
     <div id="loader-overlay"></div>
 </div>
 
-<div id="weatherResult" class="mt-4 text-center">
+<div id="weatherResult" class="container mt-4 text-center">
     <!-- Weather data will be loaded here -->
 </div>
 
@@ -53,6 +54,12 @@
         $(function () {
             $("#weatherForm").submit(function (event) {
                 event.preventDefault();
+                var locationInput = document.getElementById('location');
+                if (locationInput.value.trim() === '') {
+                    locationInput.classList.add('is-invalid'); // Add is-invalid class if input is empty
+                    return; // Exit function if input is empty
+                }
+                if (!locationInput.checkValidity()) return; // Check input validity
                 $("#loader-container").removeClass("d-none"); // Show loader
                 $("#weatherResult").empty(); // Clear previous weather data
 
@@ -65,14 +72,32 @@
                         updateToggleButtonText(); // Update the toggle button text
                     },
                     error: function (xhr, status, error) {
-                        alert("An error occurred: " + error);
+                        // Handle the error by hiding the loader and displaying an error message
+                        $("#loader-container").addClass("d-none"); // Hide loader
+                        $("#weatherResult").html('<section><div class="Container"><div class="card text-white bg-danger mb-3"><div class="card-body"><h5 class="card-title">City Not Found</h5><p class="card-text">Sorry but the city you are looking for seems to not exist. Please type in another city to view the weather</p></div></div></div></section>');
                     },
                     complete: function () {
                         $("#loader-container").addClass("d-none"); // Hide loader
                     }
                 });
             });
+
+            // Update input style on input change
+            $("#location").on("input", function () {
+                if (this.checkValidity()) {
+                    $(this).removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    $(this).removeClass("is-valid").addClass("is-invalid");
+                }
+            });
+
+            // Custom validation for the location input
+            $("#location").on("invalid", function (event) {
+                event.preventDefault();
+                $(this).addClass("is-invalid");
+            });
         });
+
 
         // Function to toggle between Celsius and Fahrenheit
         function toggleTemperatureUnit() {
@@ -113,7 +138,10 @@
                 },
                 error: function (xhr, status, error) {
                     alert("An error occurred: " + error);
-                    $("#loader-container").hide();
+                    $("#loader-container").addClass("d-none"); // Hide loader in case of error
+                },
+                complete: function () {
+                    console.log("AJAX request completed"); // Log completion of AJAX request
                 }
             });
         }
@@ -131,4 +159,3 @@
         }
     </script>
 }
-

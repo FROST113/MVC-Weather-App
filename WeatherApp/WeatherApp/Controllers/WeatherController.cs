@@ -35,7 +35,7 @@ namespace WeatherApp.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching the weather data.");
-                return Content($"An error occurred: {ex.Message}");
+                return BadRequest("An error occurred while fetching the weather data.");
             }
         }
     }
