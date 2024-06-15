@@ -1,24 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
-using WeatherApp.Models;
+using WeatherApp.Services;
 using WeatherApp.ViewModels;
 
 namespace WeatherApp.Controllers
 {
     public class WeatherController : Controller
     {
-        private readonly HttpClient _client;
-        private readonly IConfiguration _configuration;
+        private readonly IWeatherService _weatherService;
+        private readonly ILogger<WeatherController> _logger;
 
-        public WeatherController(IConfiguration configuration)
+        public WeatherController(IWeatherService weatherService, ILogger<WeatherController> logger)
         {
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri("https://api.weatherapi.com/");
-            _configuration = configuration;
+            _weatherService = weatherService;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -32,33 +29,14 @@ namespace WeatherApp.Controllers
         {
             try
             {
-                string apiKey = _configuration["WeatherApi:ApiKey"];
-                var response = await _client.GetAsync($"v1/current.json?key={apiKey}&q={location}&aqi=no");
-                response.EnsureSuccessStatusCode();
-                var responseData = await response.Content.ReadAsStringAsync();
-                var weatherData = JsonConvert.DeserializeObject<WeatherData>(responseData);
-
-                var viewModel = new WeatherViewModel
-                {
-                    Location = $"{weatherData.Location.Name}, {weatherData.Location.Country}",
-                    Temperature = unit == "C" ? $"{weatherData.Current.Temp_c} °C" : $"{weatherData.Current.Temp_f} °F",
-                    Condition = weatherData.Current.Condition.Text,
-                    IconUrl = $"https:{weatherData.Current.Condition.Icon}",
-                    WindSpeed = $"{weatherData.Current.Wind_kph} kph",
-                    Humidity = $"{weatherData.Current.Humidity}%",
-                    Pressure = $"{weatherData.Current.Pressure_mb} mb",
-                    Visibility = $"{weatherData.Current.Vis_km} km",
-                    UVIndex = $"{weatherData.Current.Uv}",
-                    CloudCover = $"{weatherData.Current.Cloud}%" 
-                };
-
+                var viewModel = await _weatherService.GetWeatherAsync(location, unit);
                 return PartialView("~/Views/WeatherForecast/_WeatherPartialView.cshtml", viewModel);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while fetching the weather data.");
                 return Content($"An error occurred: {ex.Message}");
             }
         }
-
     }
 }
